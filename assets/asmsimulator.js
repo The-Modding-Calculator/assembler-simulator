@@ -672,7 +672,7 @@ var app = angular.module('ASMSimulator', []);
                         if (self.sp < self.minSP) {
                             throw "Stack overflow";
                         } else if (self.sp > self.maxSP) {
-                            throw "Stack underflow";
+                            throw "Stack TEST!!!!--  underflow";
                         }
                     } else {
                         throw "Invalid register: " + reg;
@@ -736,14 +736,14 @@ var app = angular.module('ASMSimulator', []);
                 var push = function(value) {
                     memory.store(self.sp--, value);
                     if (self.sp < self.minSP) {
-                        throw "Stack overflow";
+                        throw "Stack _--TEST!!!!-- overflow";
                     }
                 };
 
                 var pop = function() {
                     var value = memory.load(++self.sp);
                     if (self.sp > self.maxSP) {
-                        throw "Stack underflow";
+                        throw "Stack TEST!!!!--   underflow";
                     }
 
                     return value;
@@ -765,6 +765,7 @@ var app = angular.module('ASMSimulator', []);
                 var instr = memory.load(self.ip);
                 switch(instr) {
                     case opcodes.NONE:
+                        self.ip++;
                         return false; // Abort step
                     case opcodes.MOV_REG_TO_REG:
                         regTo = checkGPR_SP(memory.load(++self.ip));
@@ -1358,10 +1359,18 @@ var app = angular.module('ASMSimulator', []);
     $scope.displayB = false;
     $scope.displayC = false;
     $scope.displayD = false;
+    $scope.displayIP = false;
+    $scope.displaySP = false;
+    $scope.highlightSrc = false;
     $scope.speeds = [{speed: 1, desc: "1 HZ"},
                      {speed: 4, desc: "4 HZ"},
                      {speed: 8, desc: "8 HZ"},
-                     {speed: 16, desc: "16 HZ"}];
+                     {speed: 16, desc: "16 HZ"},
+                     {speed: 32, desc: "32 HZ"},
+                     {speed: 64, desc: "64 HZ"},
+                     {speed: 128, desc: "128 HZ"},
+                     {speed: 512, desc: "512 HZ"}
+                    ];
     $scope.speed = 4;
     $scope.outputStartIndex = 232;
 
@@ -1384,7 +1393,7 @@ var app = angular.module('ASMSimulator', []);
             var res = cpu.step();
 
             // Mark in code
-            if (cpu.ip in $scope.mapping) {
+            if (cpu.ip in $scope.mapping && $scope.highlightSrc) {
                 $scope.selectedLine = $scope.mapping[cpu.ip];
             }
 
@@ -1486,9 +1495,9 @@ var app = angular.module('ASMSimulator', []);
     };
 
     $scope.getMemoryInnerCellCss = function (index) {
-        if (index === cpu.ip) {
+        if (index === cpu.ip && $scope.displayIP) {
             return 'marker marker-ip';
-        } else if (index === cpu.sp) {
+        } else if (index === cpu.sp && $scope.displaySP ) {
             return 'marker marker-sp';
         } else if (index === cpu.gpr[0] && $scope.displayA) {
             return 'marker marker-a';
@@ -1501,6 +1510,20 @@ var app = angular.module('ASMSimulator', []);
         } else {
             return '';
         }
+    };
+
+    $scope.getMemoryBoardCellCss = function (index) {
+        if (memory.data[index]&0x01 ) {
+            return 'marker marker-a';
+        }
+        return '';
+    };
+
+    $scope.getMemoryNextBoardCellCss = function (index) {
+        if (memory.data[index]&0x40 ) {
+            return 'marker marker-ip';
+        }
+        return '';
     };
 }]);
 ;app.filter('flag', function() {

@@ -35,7 +35,7 @@ app.service('cpu', ['opcodes', 'memory', function(opcodes, memory) {
                         if (self.sp < self.minSP) {
                             throw "Stack overflow";
                         } else if (self.sp > self.maxSP) {
-                            throw "Stack underflow";
+                            throw "Stack TEST!!!!--  underflow";
                         }
                     } else {
                         throw "Invalid register: " + reg;
@@ -99,14 +99,14 @@ app.service('cpu', ['opcodes', 'memory', function(opcodes, memory) {
                 var push = function(value) {
                     memory.store(self.sp--, value);
                     if (self.sp < self.minSP) {
-                        throw "Stack overflow";
+                        throw "Stack _--TEST!!!!-- overflow";
                     }
                 };
 
                 var pop = function() {
                     var value = memory.load(++self.sp);
                     if (self.sp > self.maxSP) {
-                        throw "Stack underflow";
+                        throw "Stack TEST!!!!--   underflow";
                     }
 
                     return value;
@@ -128,6 +128,7 @@ app.service('cpu', ['opcodes', 'memory', function(opcodes, memory) {
                 var instr = memory.load(self.ip);
                 switch(instr) {
                     case opcodes.NONE:
+                        self.ip++;
                         return false; // Abort step
                     case opcodes.MOV_REG_TO_REG:
                         regTo = checkGPR_SP(memory.load(++self.ip));

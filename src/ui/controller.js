@@ -9,10 +9,18 @@ app.controller('Ctrl', ['$document', '$scope', '$timeout', 'cpu', 'memory', 'ass
     $scope.displayB = false;
     $scope.displayC = false;
     $scope.displayD = false;
+    $scope.displayIP = false;
+    $scope.displaySP = false;
+    $scope.highlightSrc = false;
     $scope.speeds = [{speed: 1, desc: "1 HZ"},
                      {speed: 4, desc: "4 HZ"},
                      {speed: 8, desc: "8 HZ"},
-                     {speed: 16, desc: "16 HZ"}];
+                     {speed: 16, desc: "16 HZ"},
+                     {speed: 32, desc: "32 HZ"},
+                     {speed: 64, desc: "64 HZ"},
+                     {speed: 128, desc: "128 HZ"},
+                     {speed: 512, desc: "512 HZ"}
+                    ];
     $scope.speed = 4;
     $scope.outputStartIndex = 232;
 
@@ -35,7 +43,7 @@ app.controller('Ctrl', ['$document', '$scope', '$timeout', 'cpu', 'memory', 'ass
             var res = cpu.step();
 
             // Mark in code
-            if (cpu.ip in $scope.mapping) {
+            if (cpu.ip in $scope.mapping && $scope.highlightSrc) {
                 $scope.selectedLine = $scope.mapping[cpu.ip];
             }
 
@@ -137,9 +145,9 @@ app.controller('Ctrl', ['$document', '$scope', '$timeout', 'cpu', 'memory', 'ass
     };
 
     $scope.getMemoryInnerCellCss = function (index) {
-        if (index === cpu.ip) {
+        if (index === cpu.ip && $scope.displayIP) {
             return 'marker marker-ip';
-        } else if (index === cpu.sp) {
+        } else if (index === cpu.sp && $scope.displaySP ) {
             return 'marker marker-sp';
         } else if (index === cpu.gpr[0] && $scope.displayA) {
             return 'marker marker-a';
@@ -152,5 +160,19 @@ app.controller('Ctrl', ['$document', '$scope', '$timeout', 'cpu', 'memory', 'ass
         } else {
             return '';
         }
+    };
+
+    $scope.getMemoryBoardCellCss = function (index) {
+        if (memory.data[index]&0x01 ) {
+            return 'marker marker-a';
+        }
+        return '';
+    };
+
+    $scope.getMemoryNextBoardCellCss = function (index) {
+        if (memory.data[index]&0x40 ) {
+            return 'marker marker-ip';
+        }
+        return '';
     };
 }]);
